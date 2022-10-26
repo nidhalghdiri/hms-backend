@@ -9,6 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use("/", express.static(path.join(__dirname, "public")));
 // Setup and require Routes
 readdirSync("./routes").map((r) => app.use("/", require("./routes/" + r)));
 
@@ -16,14 +17,21 @@ readdirSync("./routes").map((r) => app.use("/", require("./routes/" + r)));
 require("./startup/db")();
 require("./startup/prod")(app);
 
-app.use(express.static(path.join("https://hms-oman.onrender.com/", "build")));
-
-// ...
-// Right before your app.listen(), add this:
 app.get("*", (req, res) => {
   res.sendFile(
     path.join("https://hms-oman.onrender.com/", "build", "index.html")
   );
+});
+
+app.all("*", (req, res) => {
+  res.status(404);
+  if (req.accepts("html")) {
+    res.type("txt").send("404 Page");
+  } else if (req.accepts("json")) {
+    res.json({ message: "404 Not Found" });
+  } else {
+    res.type("txt").send("404 Not Found");
+  }
 });
 
 const PORT = process.env.PORT || 8000;
