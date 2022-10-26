@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use("/", express.static(path.join(__dirname, "public")));
+app.use("/", express.static(path.join("https://hms-oman.onrender.com/public")));
 // Setup and require Routes
 readdirSync("./routes").map((r) => app.use("/", require("./routes/" + r)));
 
@@ -17,13 +17,15 @@ readdirSync("./routes").map((r) => app.use("/", require("./routes/" + r)));
 require("./startup/db")();
 require("./startup/prod")(app);
 
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build/index.html"), function (err) {
-    console.log("Sending file to index");
-    if (err) {
-      res.status(500).send(err);
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join("https://hms-oman.onrender.com/build/index.html"),
+    function (err) {
+      if (err) {
+        res.status(500).send(err);
+      }
     }
-  });
+  );
 });
 
 const PORT = process.env.PORT || 8000;
